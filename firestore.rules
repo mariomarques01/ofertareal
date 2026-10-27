@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Substitua o valor abaixo pelo UID do seu login Google no painel admin.
+    function isAdmin() {
+      return request.auth != null && request.auth.uid == 'SUBSTITUA_PELO_SEU_UID';
+    }
+    match /products/{productId} {
+      allow get: if isAdmin() || resource.data.active == true;
+      allow list: if isAdmin() || (request.query.limit != null && request.query.limit <= 100 && resource.data.active == true);
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name','brand','price','ref','old','icon','url','source','active','updatedAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 160
+        && request.resource.data.price is number
+        && request.resource.data.price > 0
+        && request.resource.data.ref is number
+        && request.resource.data.ref > 0
+        && request.resource.data.active is bool;
+      allow delete: if false;
+    }
+    match /users/{userId}/alerts/{alertId} {
+      allow read, delete: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['productId','target','createdAt','active'])
+        && request.resource.data.productId is string
+        && request.resource.data.productId.size() <= 128
+        && request.resource.data.target is number
+        && request.resource.data.target > 0
+        && request.resource.data.target < 10000000
+        && request.resource.data.active == true
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
