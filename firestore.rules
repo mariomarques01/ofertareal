@@ -19,7 +19,7 @@ service cloud.firestore {
         && request.resource.data.sku.matches('^[A-Z0-9][A-Z0-9_-]{2,63}$')
         && (!('sku' in resource.data)
           || request.resource.data.sku == resource.data.sku);
-      allow delete: if false;
+      allow delete: if isAdmin();
     }
     function validProduct() {
       return request.resource.data.keys().hasOnly([
