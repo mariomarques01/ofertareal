@@ -5,7 +5,7 @@ document.body.appendChild(status);
 if(!firebaseConfig.projectId || !firebaseConfig.apiKey){status.textContent='Modo demonstração: configure firebase-config.js para conectar o banco.';}
 else {
  try {
-  const [{initializeApp},{getFirestore,collection,query,where,limit,onSnapshot,addDoc,serverTimestamp},{getAuth,signInAnonymously,onAuthStateChanged}]=await Promise.all([
+  const [{initializeApp},{getFirestore,collection,query,where,limit,onSnapshot,addDoc,getDocs,serverTimestamp},{getAuth,signInAnonymously,onAuthStateChanged}]=await Promise.all([
    import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js'),
    import('https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js'),
    import('https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js')]);
@@ -17,6 +17,7 @@ else {
    const data=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>typeof p.name==='string'&&Number.isFinite(p.price)&&Number.isFinite(p.ref)&&p.ref>0).map(p=>({...p,icon:p.icon||'🛍️',brand:p.brand||'OFERTA',old:p.old||p.ref}));
    products=data;render();status.textContent=data.length?`Firebase conectado • ${data.length} produtos cadastrados`:'Firebase conectado • nenhum produto cadastrado';
   },err=>{status.textContent='Erro ao ler produtos: '+err.code;console.error(err)});
+  window.firebaseGetHistory=async productId=>{const snap=await getDocs(query(collection(db,'price_history'),where('productId','==',productId),limit(100)));return snap.docs.map(d=>d.data()).sort((a,b)=>(b.recordedAt?.seconds||0)-(a.recordedAt?.seconds||0))};
   window.firebaseSaveAlert=async(product,target)=>{
    if(!uid){toast('Aguarde a autenticação.');return}
    try{await addDoc(collection(db,'users',uid,'alerts'),{productId:String(product.id),target,createdAt:serverTimestamp(),active:true});closeModal();toast('Alerta salvo no Firebase! O envio automático ainda não está ativo.');}
