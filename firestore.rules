@@ -9,7 +9,7 @@ service cloud.firestore {
       allow get: if isAdmin() || resource.data.active == true;
       allow list: if isAdmin() || (request.query.limit != null && request.query.limit <= 100 && resource.data.active == true);
       allow create, update: if isAdmin()
-        && request.resource.data.keys().hasOnly(['name','brand','price','ref','old','icon','url','source','active','updatedAt'])
+        && request.resource.data.keys().hasOnly(['name','brand','price','ref','old','icon','url','source','store','active','updatedAt'])
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
         && request.resource.data.name.size() <= 160
@@ -19,6 +19,22 @@ service cloud.firestore {
         && request.resource.data.ref > 0
         && request.resource.data.active is bool;
       allow delete: if false;
+    }
+    // Histórico imutável: somente o administrador registra observações.
+    // O público só pode ler registros, nunca criar ou alterar.
+    match /price_history/{historyId} {
+      allow read: if true;
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['productId','price','store','source','recordedAt','recordedBy'])
+        && request.resource.data.productId is string
+        && request.resource.data.productId.size() > 0
+        && request.resource.data.price is number
+        && request.resource.data.price > 0
+        && request.resource.data.store is string
+        && request.resource.data.source is string
+        && request.resource.data.recordedBy == request.auth.uid
+        && request.resource.data.recordedAt == request.time;
+      allow update, delete: if false;
     }
     match /users/{userId}/alerts/{alertId} {
       allow read, delete: if request.auth != null && request.auth.uid == userId;
