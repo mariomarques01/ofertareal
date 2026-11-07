@@ -11,7 +11,7 @@ A análise usa observações registradas, e não o campo de referência digitado
 
 ## Administrador
 
-Entre com Google no painel e copie seu UID. Um responsável com acesso ao projeto Firebase `blackfriday-c66bd` precisa substituir `SUBSTITUA_PELO_SEU_UID` em `firestore.rules` e publicar as regras. Não abra a escrita ao público. Autorize `mariomarques01.github.io` nos domínios do Firebase Authentication e habilite o provedor Google. A autenticação sozinha não concede permissão administrativa.
+A conta Google proprietária já está autorizada pelo UID nas regras publicadas do projeto `blackfriday-c66bd`, e o domínio `mariomarques01.github.io` já está autorizado no Firebase Authentication. O arquivo de regras do repositório foi sincronizado com o publicado. Entre com a mesma conta Google no painel. A autenticação de outras contas não concede permissão administrativa; não abra a escrita ao público.
 
 Cada salvamento confirma uma observação com data do servidor, mesmo quando o preço não mudou. Mantenha o mesmo SKU apenas para a mesma variante e condições. Informe loja, URL HTTPS e origem com as condições de pagamento e frete. Evite alterar essas condições no mesmo SKU.
 
