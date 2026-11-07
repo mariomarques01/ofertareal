@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "npx serve . -l 8080",
-    "deploy": "firebase deploy --only hosting,firestore:rules"
+    "deploy": "firebase deploy --only hosting,firestore:rules",
+    "test": "node --test"
   },
   "devDependencies": {
     "firebase-tools": "^14.0.0"
