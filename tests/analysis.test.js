@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {analyzePrice} from '../analysis.js';
+const now=Date.UTC(2026,10,7,12);
+const stamp=t=>({seconds:t/1000});
+const product={price:80,old:9999,ref:9999,store:'Loja A',source:'Manual, Pix, sem frete',updatedAt:stamp(now)};
+const prior=Array.from({length:7},(_,i)=>({price:100,store:product.store,source:product.source,recordedAt:stamp(now-(i+1)*86400000)}));
+const history=[...prior,{price:product.price,store:product.store,source:product.source,recordedAt:stamp(now)}];
+test('queda usa sete dias reais e ignora referência digitada',()=>{const a=analyzePrice(product,history,now);assert.equal(a.label,'Abaixo do histórico registrado');assert.equal(a.median,100);assert.ok(a.discount>=19)});
+test('duplicar observações no mesmo dia não cria evidência',()=>assert.equal(analyzePrice(product,[...Array(20).fill(history[0]),history.at(-1)],now).label,'Histórico insuficiente'));
+test('outra loja, origem, futuro ou preço inválido não entram na base',()=>{for(const change of [{store:'Outra'},{source:'Outro'},{price:-1},{recordedAt:stamp(now+86400000)}])assert.equal(analyzePrice(product,[...prior.map(h=>({...h,...change})),history.at(-1)],now).label,'Histórico insuficiente')});
+test('preço antigo não é classificado como oportunidade',()=>assert.equal(analyzePrice(product,history.map(h=>({...h,recordedAt:stamp(h.recordedAt.seconds*1000-2*86400000)})),now).label,'Preço desatualizado'));
+test('queda na mediana não basta se já houve preço menor',()=>assert.equal(analyzePrice(product,[{...history[0],price:70},...history.slice(1)],now).label,'Sem oportunidade comprovada'));
+test('sem histórico não inventa desconto',()=>assert.equal(analyzePrice(product,[],now).discount,0));

@@ -4,7 +4,7 @@ service cloud.firestore {
     // Troque o marcador pelo UID do administrador antes de publicar.
     function isAdmin() {
       return request.auth != null
-        && request.auth.uid == 'SUBSTITUA_PELO_SEU_UID';
+        && request.auth.uid == 'FAqo2zBbqKgmNodrfHMv2Rzn2IO2';
     }
     match /products/{productId} {
       allow get: if isAdmin() || resource.data.active == true;

@@ -29,4 +29,4 @@ Receber observações de preços de fontes autorizadas e persistir histórico no
 
 ## Situação atual
 
-O painel admin permite cadastro manual e grava uma observação em price_history a cada salvamento. Isso não comprova preços anteriores e não é uma integração automática.
+O painel admin permite cadastro manual e grava uma observação em price_history a cada confirmação de preço, inclusive quando o valor não muda. Isso não comprova preços anteriores e não é uma integração automática.
